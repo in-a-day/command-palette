@@ -71,15 +71,18 @@ function PaletteNode:add_sibling(sibling)
   return self.parent:add_child(sibling)
 end
 
--- TODO implement the open method to open node.
+-- implement the open method to open node.
 -- using strategy to open
 --- open the node, create panel show node's children
 function PaletteNode:open(strategy_name)
-  -- pass
   strategy.fn(strategy_name)({}, self)
 end
 
-function PaletteNode:sopen()
+-- implement the close method to close node.
+-- using strategy to close
+--- close the node
+function PaletteNode:close(strategy_name)
+  -- TODO close
 end
 
 --- run the node command

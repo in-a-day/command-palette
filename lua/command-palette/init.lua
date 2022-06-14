@@ -14,6 +14,11 @@ function M.setup(opts)
   }
 
   M.palette = PaletteNode.new(fake_node, nil)
+
+  -- add user command
+  vim.api.nvim_create_user_command("CommandPaletteOpen", function()
+    M.palette:open()
+  end, { desc = "Open Command Palette" })
   return M.palette
 end
 

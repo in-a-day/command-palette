@@ -4,10 +4,42 @@ local finders = require "telescope.finders"
 local conf = require("telescope.config").values
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
+local entry_display = require "telescope.pickers.entry_display"
+
 
 local cp = require("command-palette")
 local cp_conf = require("command-palette.config").config
 local cp_strategy = require("command-palette.strategy")
+
+local function is_empty(tbl)
+  return tbl == nil or vim.tbl_isempty(tbl)
+end
+
+local function hide_desc(tbl)
+  local icon = is_empty(tbl.value.children) and ' ' or 'פּ '
+  return icon .. tbl.value.label
+end
+
+local function finder_maker(tbl)
+  if not cp_conf.telescope.show_desc then
+    return hide_desc(tbl)
+  end
+
+  local icon = is_empty(tbl.value.children) and ' ' or 'פּ '
+  local desc = tbl.value.desc or tbl.value.cmd
+  desc = vim.is_callable(desc) and "Function..." or desc
+  local displayer = entry_display.create({
+    separator = " ",
+    items = {
+      { width = 32 },
+      { remaining = true },
+    },
+  })
+  return displayer({
+    { icon .. tbl.value.label },
+    { desc },
+  })
+end
 
 --- open node
 ---@param opts table configs
@@ -25,9 +57,7 @@ local function open(opts, node)
       entry_maker = function(entry)
         return {
           value = entry,
-          display = function(tbl)
-            return tbl.value.label
-          end,
+          display = finder_maker,
           ordinal = entry.label,
         }
       end
@@ -41,11 +71,12 @@ local function open(opts, node)
         actions.close(prompt_bufnr)
         local selected = action_state.get_selected_entry()
         if not selected then
-          vim.notify("Nothing Selected!")
+          vim.notify("Nothing selected.")
           return
         end
         local selected_node = selected.value
         if not selected_node then
+          vim.notify("Selected node is nil.")
           return
         end
         if selected_node:is_leaf() then

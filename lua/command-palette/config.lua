@@ -22,6 +22,7 @@ M.config = {
       register = true,  -- add telescope
       as_default = true,  -- set telescope strategy as default
     },
+    show_desc = false,  -- show node description
   },
   default_keymap = false,  -- not support for now, true or false, use default keymap
   register_on_absent = false, -- not support for now, register keymap when node keymap is absent
