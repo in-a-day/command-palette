@@ -1,4 +1,5 @@
 local strategy = require("command-palette.strategy")
+local utils = require("command-palette.utils")
 local PaletteNode = {}
 PaletteNode.__index = PaletteNode
 
@@ -11,25 +12,44 @@ local function add_child(node, child)
   node.label_to_child[child.label] = child
 end
 
+-- do not change the original opt
+local function format_opt(opt)
+  opt = opt or {}
+  opt = vim.deepcopy(opt)
+  if not opt.children then
+    opt.children = {}
+  end
+
+  if opt.auto_detect then
+    local user_commands = utils.find_user_commands(opt.label)
+    for _, val in ipairs(user_commands) do
+      table.insert(opt.children, { label = val, cmd = val })
+    end
+  end
+  return opt
+end
+
 -- opt: see config.lua
 --- create node recursively
 local function create(opt, parent)
-  -- TODO check opt
-  opt = opt or {}
+  local conf = format_opt(opt)
   local node = {
-    label = opt.label,
-    desc = opt.desc,
+    label = conf.label,
+    desc = conf.desc,
     parent = parent,
-    cmd = opt.cmd,
+    cmd = conf.cmd,
     children = {},
-    label_to_child = {},  -- used for function next()
+    label_to_child = {},
   }
   -- populate children
-  if not is_emtpy(opt.children) then
-    for _, child_opt in ipairs(opt.children) do
-      -- create child
-      local child_node = PaletteNode.new(child_opt, node)
-      add_child(node, child_node)
+  if not is_emtpy(conf.children) then
+    for _, child_opt in ipairs(conf.children) do
+      -- create only when child do not exist
+      if not node.label_to_child[child_opt.label] then
+        -- create child
+        local child_node = PaletteNode.new(child_opt, node)
+        add_child(node, child_node)
+      end
     end
   end
 
@@ -54,7 +74,6 @@ function PaletteNode:runnable()
   return not self:is_leaf()
 end
 
--- TODO myabe seperate this function to two function
 --- add node to its children, return itself
 ---@param child table: PaletteNode a node or configs of this node
 ---@return table: PaletteNode

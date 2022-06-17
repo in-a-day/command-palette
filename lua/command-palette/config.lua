@@ -7,6 +7,7 @@ local node_config = {
   cmd = nil, -- optional, lua fucntion or vim command, execute when node is selected, if node is a parent node, you should not provide this
   children = nil, -- array or nil, an array of node_config
   keymap = nil,  -- string, register cmd with keymap, current don't support
+  auto_detect = false,
 }
 
 -- configs for this plugin

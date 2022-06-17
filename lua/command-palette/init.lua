@@ -3,23 +3,41 @@ local M = {}
 local config = require("command-palette.config")
 local strategy = require("command-palette.strategy")
 local PaletteNode = require("command-palette.palette_node")
+local create_user_cmd = vim.api.nvim_create_user_command
+
+local function create_cmd()
+  create_user_cmd("CommandPaletteOpen", function()
+    M.palette:open()
+  end, { desc = "Open Command Palette" })
+  create_user_cmd("CommandPaletteRefresh", function()
+    M.refresh()
+  end, { desc = "Refesh Command Palette" })
+end
 
 function M.setup(opts)
+  local palette = M.init(opts, false)
+  create_cmd()
+
+  return palette
+end
+
+function M.init(opts, refresh)
   opts = opts or {}
   config.config = vim.tbl_deep_extend("force", config.config, opts)
-  strategy.change_strategy(config.config.strategy)
+  if not refresh then
+    strategy.change_strategy(config.config.strategy)
+  end
   local fake_node = {
     label = "Command Palette",
     children = config.config.nodes,
   }
 
   M.palette = PaletteNode.new(fake_node, nil)
-
-  -- add user command
-  vim.api.nvim_create_user_command("CommandPaletteOpen", function()
-    M.palette:open()
-  end, { desc = "Open Command Palette" })
   return M.palette
+end
+
+function M.refresh()
+  return M.init({}, true)
 end
 
 return M
