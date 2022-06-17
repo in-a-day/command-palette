@@ -108,21 +108,24 @@ end
 function PaletteNode:run()
   if not self:is_leaf() then
     vim.notify("Cannot run on this node.")
+    return
   end
   if not self.cmd then
     vim.notify("No command is provided.")
+    return
   end
   if vim.is_callable(self.cmd) then
     self.cmd()
+    return
   end
   vim.api.nvim_exec(self.cmd, true)
 end
 
---- find child node by specified desc
----@param desc string desc of child
+--- find child node by specified label
+---@param label string label of child
 ---@return table: PaletteNode
-function PaletteNode:next(desc)
-  return self.label_to_child[desc]
+function PaletteNode:next(label)
+  return self.label_to_child[label]
 end
 
 return PaletteNode
