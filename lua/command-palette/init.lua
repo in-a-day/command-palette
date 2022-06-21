@@ -12,6 +12,15 @@ local function create_cmd()
   create_user_cmd("CommandPaletteRefresh", function()
     M.refresh()
   end, { desc = "Refesh Command Palette" })
+
+  -- refresh on buffer enter
+  vim.api.nvim_create_autocmd("BufEnter", {
+    desc = "CommandPalette Refresh",
+    callback = function ()
+      M.refresh()
+    end
+    -- callback = M.refresh,
+  })
 end
 
 function M.setup(opts)
