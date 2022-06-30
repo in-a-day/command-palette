@@ -50,6 +50,9 @@ local function open(opts, node)
     return
   end
   opts = opts or {}
+  opts.layout_config = opts.layout_config or { 
+    horizontal = { width = 0.5 },
+  }
   pickers.new(opts, {
     prompt_title = node.label,
     finder = finders.new_table {
