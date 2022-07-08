@@ -51,7 +51,7 @@ local function open(opts, node)
   end
   opts = opts or {}
   opts.layout_config = opts.layout_config or { 
-    horizontal = { width = 0.5 },
+    horizontal = { width = 0.5, height = 0.8 },
   }
   pickers.new(opts, {
     prompt_title = node.label,
